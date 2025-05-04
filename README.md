@@ -1,4 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TasteCheq
+
+A mobile-first PWA for scanning, recording, and rating menu items from restaurants, bars, and more. Built with Next.js, TailwindCSS, Shadcn UI, Kysely, Prisma, Lucia, React Hook Form, Arktype, and more.
+
+## Project Structure
+
+```
+/ (root)
+  /app           # Next.js app directory (pages, layouts, routing)
+  /components    # Reusable React components (with Storybook stories)
+  /db            # Kysely DB client, Prisma schema/migrations
+  /lib           # Utility functions, hooks, helpers
+  /public        # Static assets (favicons, images)
+  /styles        # Tailwind config, global styles
+  /tests         # Vite unit/integration tests
+  /docs          # Project documentation
+```
+
+## Tooling
+
+- **Biome**: Linting and formatting
+- **Knip**: Unused code detection
+- **Vitest**: Unit/integration testing
+- **Storybook**: UI component development/testing
+- **PNPM**: Package management
+
+## CI/CD
+
+- **GitHub Actions**: Runs Biome, Knip, Vitest, and Storybook build on every push/PR to `main`.
+
+## Scripts
+
+- `pnpm biome check .` — Lint and format check
+- `pnpm knip --strict` — Unused code check
+- `pnpm vitest run --coverage` — Run all tests with coverage
+- `pnpm storybook` — Run Storybook locally
+- `pnpm build-storybook` — Build Storybook static site
+
+## Environment
+
+- Copy `.env.example` to `.env` and fill in your secrets (Postgres, API keys, etc.)
+
+## Documentation
+
+See the `/docs` folder for full planning, architecture, and tech stack details.
 
 ## Getting Started
 
