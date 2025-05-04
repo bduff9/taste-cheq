@@ -1,0 +1,11 @@
+{
+	"ignore": [
+		"src/components/ui/*",
+		"src/lib/db-types.ts",
+		"src/app/auth/login-action.mock.ts",
+		"src/app/auth/signup-action.mock.ts",
+		"src/app/auth/logout-action.mock.ts",
+		"storybook-static/**"
+	],
+	"ignoreDependencies": ["tailwindcss", "tw-animate-css"]
+}

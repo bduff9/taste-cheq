@@ -3,3 +3,5 @@ dist/
 *.env
 .next/
 .env
+coverage/
+storybook-static/

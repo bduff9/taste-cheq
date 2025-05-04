@@ -2,9 +2,7 @@
 import { deleteSession } from "@/lib/auth";
 import { cookies } from "next/headers";
 
-export type LogoutResult = { success: boolean };
-
-export async function logout(): Promise<LogoutResult> {
+export async function logout(): Promise<void> {
 	const cookieStore = await cookies();
 	const sessionId = cookieStore.get("session")?.value;
 	if (sessionId) {
@@ -17,5 +15,4 @@ export async function logout(): Promise<LogoutResult> {
 			path: "/",
 		});
 	}
-	return { success: true };
 }

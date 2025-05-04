@@ -2,16 +2,13 @@
 import { createSession, createUser, getUserByEmail } from "@/lib/auth";
 import { cookies } from "next/headers";
 
-export type SignupInput = {
+export async function signup(input: {
 	email: string;
 	password: string;
 	name: string;
 	city?: string;
 	state?: string;
-};
-export type SignupResult = { success: boolean; error?: string };
-
-export async function signup(input: SignupInput): Promise<SignupResult> {
+}): Promise<{ success: boolean; error?: string }> {
 	// Basic validation
 	if (!input.email || !input.password || !input.name) {
 		return { success: false, error: "All fields are required." };

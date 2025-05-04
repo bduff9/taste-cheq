@@ -19,29 +19,39 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { arktypeResolver } from "@hookform/resolvers/arktype";
+import { type } from "arktype";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-type LoginFormData = {
-	email: string;
-	password: string;
-};
+const loginSchema = type({
+	email: "string.email",
+	password: "string>6",
+});
 
-type SignupFormData = {
-	email: string;
-	password: string;
-	confirmPassword: string;
-	name: string;
-	city: string;
-	state: string;
-};
+type LoginFormData = typeof loginSchema.infer;
+
+const signupSchema = type({
+	email: "string.email",
+	password: "string>6",
+	confirmPassword: "string>6",
+	name: "string>2",
+	city: "string>2",
+	state: "string>2",
+});
+
+type SignupFormData = typeof signupSchema.infer;
 
 const HomePage = () => {
 	const { user } = useUser();
 	const [showAuth, setShowAuth] = useState<"none" | "login" | "signup">("none");
-	const loginForm = useForm<LoginFormData>();
+	const loginForm = useForm<LoginFormData>({
+		resolver: arktypeResolver(loginSchema),
+		mode: "onSubmit",
+	});
 	const signupForm = useForm<SignupFormData>({
+		resolver: arktypeResolver(signupSchema),
 		mode: "onSubmit",
 		reValidateMode: "onChange",
 		defaultValues: { city: "", state: "" },

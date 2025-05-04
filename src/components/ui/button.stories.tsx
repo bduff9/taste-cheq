@@ -13,6 +13,7 @@ export const Default: Story = {
 	args: {
 		children: "Default Button",
 	},
+	render: (args) => <Button {...args} />,
 };
 
 export const Outline: Story = {
@@ -20,6 +21,7 @@ export const Outline: Story = {
 		children: "Outline Button",
 		variant: "outline",
 	},
+	render: (args) => <Button {...args} />,
 };
 
 export const Secondary: Story = {
@@ -27,6 +29,7 @@ export const Secondary: Story = {
 		children: "Secondary Button",
 		variant: "secondary",
 	},
+	render: (args) => <Button {...args} />,
 };
 
 export const Destructive: Story = {
@@ -34,6 +37,7 @@ export const Destructive: Story = {
 		children: "Destructive Button",
 		variant: "destructive",
 	},
+	render: (args) => <Button {...args} />,
 };
 
 export const Ghost: Story = {
@@ -41,6 +45,7 @@ export const Ghost: Story = {
 		children: "Ghost Button",
 		variant: "ghost",
 	},
+	render: (args) => <Button {...args} />,
 };
 
 export const Link: Story = {
@@ -48,6 +53,7 @@ export const Link: Story = {
 		children: "Link Button",
 		variant: "link",
 	},
+	render: (args) => <Button {...args} />,
 };
 
 export const Large: Story = {
@@ -55,6 +61,7 @@ export const Large: Story = {
 		children: "Large Button",
 		size: "lg",
 	},
+	render: (args) => <Button {...args} />,
 };
 
 export const Small: Story = {
@@ -62,4 +69,5 @@ export const Small: Story = {
 		children: "Small Button",
 		size: "sm",
 	},
+	render: (args) => <Button {...args} />,
 };

@@ -14,6 +14,7 @@ export const Default: Story = {
 	args: {
 		placeholder: "Type here...",
 	},
+	render: (args) => <Input {...args} />,
 };
 
 export const PasswordWithToggle: Story = {

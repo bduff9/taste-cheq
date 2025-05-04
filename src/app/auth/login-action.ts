@@ -2,10 +2,10 @@
 import { createSession, verifyUserPassword } from "@/lib/auth";
 import { cookies } from "next/headers";
 
-export type LoginInput = { email: string; password: string };
-export type LoginResult = { success: boolean; error?: string };
-
-export async function login(input: LoginInput): Promise<LoginResult> {
+export async function login(input: {
+	email: string;
+	password: string;
+}): Promise<{ success: boolean; error?: string }> {
 	// Validate input (simple runtime check)
 	if (!input.email || !input.password) {
 		return { success: false, error: "Email and password are required." };
