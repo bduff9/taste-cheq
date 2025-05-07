@@ -2,6 +2,7 @@
 import { login } from "@/app/auth/login-action";
 import { logout } from "@/app/auth/logout-action";
 import { signup } from "@/app/auth/signup-action";
+import ProfileNav from "@/app/profile/ProfileNav";
 import { useUser } from "@/components/UserProvider";
 import { Button } from "@/components/ui/button";
 import {
@@ -119,44 +120,11 @@ const HomePage = () => {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-white">
-			{/* Hero Section */}
-			<header className="w-full px-4 py-6 flex justify-between items-center max-w-4xl mx-auto">
-				<div className="flex items-center gap-2">
-					<Image
-						src="/logo.svg"
-						alt="TasteCheq Logo"
-						width={40}
-						height={40}
-						className="rounded"
-					/>
-					<span className="text-2xl font-bold text-blue-700">TasteCheq</span>
-				</div>
-				{!user ? (
-					<div className="flex gap-2">
-						<Button onClick={() => setShowAuth("signup")}>Sign Up</Button>
-						<Button variant="outline" onClick={() => setShowAuth("login")}>
-							Sign In
-						</Button>
-					</div>
-				) : (
-					<div className="flex gap-2 items-center">
-						<span className="text-blue-700 font-semibold">
-							Welcome, {user.name}!
-						</span>
-						<Button
-							onClick={onLogout}
-							disabled={logoutLoading}
-							variant="secondary"
-						>
-							{logoutLoading ? "Logging out..." : "Logout"}
-						</Button>
-					</div>
-				)}
-			</header>
+		<div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-white overflow-x-hidden">
+			<ProfileNav />
 
 			{/* Main Hero */}
-			<main className="flex-1 flex flex-col items-center justify-center text-center px-4">
+			<main className="flex-1 flex flex-col items-center justify-center text-center px-2 sm:px-4">
 				<div className="max-w-2xl mx-auto">
 					<h1 className="text-4xl sm:text-5xl font-extrabold text-blue-800 mb-4">
 						Scan, Record, and Rate Menu Items Anywhere
@@ -182,10 +150,10 @@ const HomePage = () => {
 						</div>
 					)}
 					<Image
-						src="/hero-menu.svg"
+						src="/hero-menu.jpeg"
 						alt="Menu scanning illustration"
 						width={400}
-						height={220}
+						height={400}
 						className="mx-auto mb-8"
 					/>
 				</div>
@@ -458,18 +426,20 @@ const HomePage = () => {
 
 			{/* Footer */}
 			<footer className="w-full py-8 bg-blue-900 text-white text-center mt-16">
-				<div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 px-4">
-					<div className="flex items-center gap-2">
+				<div className="max-w-4xl mx-auto flex flex-col sm:flex-row flex-wrap items-center justify-between gap-4 px-2 sm:px-4">
+					<div className="flex items-center gap-2 min-w-0">
 						<Image
 							src="/logo.svg"
 							alt="TasteCheq Logo"
-							width={32}
-							height={32}
+							width={28}
+							height={28}
 							className="rounded"
 						/>
-						<span className="font-bold text-lg">TasteCheq</span>
+						<span className="font-bold text-base sm:text-lg truncate">
+							TasteCheq
+						</span>
 					</div>
-					<div className="flex gap-6 text-sm">
+					<div className="flex gap-4 sm:gap-6 text-xs sm:text-sm flex-wrap items-center">
 						<a href="/about" className="hover:underline">
 							About
 						</a>
@@ -479,24 +449,32 @@ const HomePage = () => {
 						<a href="/privacy" className="hover:underline">
 							Privacy
 						</a>
-						<a href="/profile" className="hover:underline">
-							Profile
-						</a>
+						{user && (
+							<a href="/profile" className="hover:underline">
+								Profile
+							</a>
+						)}
 					</div>
-					<div className="text-xs text-blue-200">
+					<div className="text-xs text-blue-200 min-w-0 truncate">
 						&copy; {new Date().getFullYear()} TasteCheq. All rights reserved.
 					</div>
 				</div>
 			</footer>
 
-			{/* Floating Scan Button (FAB) */}
-			{pathname !== "/scan" && (
+			{/* Floating Scan Button (FAB) - only show if signed in */}
+			{user && pathname !== "/scan" && (
 				<Link
 					href="/scan"
-					className="fixed bottom-6 right-6 rounded-full shadow-lg bg-blue-700 text-white hover:bg-blue-800 h-16 w-16 flex items-center justify-center z-50 transition-colors"
+					className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 rounded-full shadow-lg bg-blue-700 text-white hover:bg-blue-800 h-14 w-14 sm:h-16 sm:w-16 flex items-center justify-center z-50 transition-colors"
 					aria-label="Scan a Menu"
 				>
-					<Image src="/scan-icon.svg" alt="Scan" width={36} height={36} />
+					<Image
+						src="/scan-icon.svg"
+						alt="Scan"
+						width={28}
+						height={28}
+						className="sm:w-9 sm:h-9 w-7 h-7"
+					/>
 				</Link>
 			)}
 		</div>

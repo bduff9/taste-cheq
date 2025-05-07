@@ -75,37 +75,34 @@ const ScanFlowClient: FC<ScanFlowClientProps> = ({
 		setTriedItems(userTriedItems);
 	}, [userRatings, userTriedItems]);
 
-	// Debug: log menuItems when rendering step 3
-	if (typeof window !== "undefined" && step === 3) {
-		// eslint-disable-next-line no-console
-		console.log("Step 3 menuItems:", menuItems);
-	}
-
 	return (
-		<div className="max-w-xl mx-auto p-4">
+		<div className="max-w-xl mx-auto p-2 sm:p-4">
 			{/* Step Indicator */}
-			<div className="flex items-center justify-center gap-4 mb-8">
+			<div className="flex items-center justify-center gap-2 sm:gap-4 mb-6 sm:mb-8 overflow-x-auto flex-wrap">
 				{steps.map((s, i) => {
 					const idx = i + 1;
 					const active = step === idx;
 					const complete = step > idx;
 					return (
-						<div key={s.label} className="flex items-center gap-2">
+						<div
+							key={s.label}
+							className="flex items-center gap-1 sm:gap-2 min-w-0"
+						>
 							<div
-								className={`rounded-full w-8 h-8 flex items-center justify-center font-bold border-2 transition-colors
-                  ${active ? "bg-blue-700 text-white border-blue-700" : complete ? "bg-blue-200 text-blue-700 border-blue-400" : "bg-gray-100 text-gray-400 border-gray-300"}
-                `}
+								className={`rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center font-bold border-2 transition-colors
+								${active ? "bg-blue-700 text-white border-blue-700" : complete ? "bg-blue-200 text-blue-700 border-blue-400" : "bg-gray-100 text-gray-400 border-gray-300"}
+							`}
 							>
 								{idx}
 							</div>
 							<span
-								className={`text-sm font-medium ${active ? "text-blue-700" : complete ? "text-blue-400" : "text-gray-400"}`}
+								className={`text-xs sm:text-sm font-medium min-w-0 truncate ${active ? "text-blue-700" : complete ? "text-blue-400" : "text-gray-400"}`}
 							>
 								{s.label}
 							</span>
 							{i < steps.length - 1 && (
 								<div
-									className={`w-8 h-1 rounded ${step > idx ? "bg-blue-400" : "bg-gray-200"}`}
+									className={`w-6 sm:w-8 h-1 rounded ${step > idx ? "bg-blue-400" : "bg-gray-200"}`}
 								/>
 							)}
 						</div>

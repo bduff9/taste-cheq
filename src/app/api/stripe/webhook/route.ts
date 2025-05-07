@@ -13,7 +13,7 @@ const stripe = new Stripe(STRIPE_SECRET_KEY, {
 
 export async function POST(req: NextRequest) {
 	const sig = req.headers.get("stripe-signature");
-	console.log("sig", sig);
+
 	if (!sig) {
 		return new Response("Missing Stripe signature", { status: 400 });
 	}
@@ -26,7 +26,6 @@ export async function POST(req: NextRequest) {
 			STRIPE_WEBHOOK_SECRET,
 		);
 	} catch (err) {
-		console.log("err", err);
 		return new Response(`Webhook Error: ${(err as Error).message}`, {
 			status: 400,
 		});
@@ -35,7 +34,6 @@ export async function POST(req: NextRequest) {
 	// Handle event types
 	if (event.type === "checkout.session.completed") {
 		const session = event.data.object as Stripe.Checkout.Session;
-		console.log(JSON.stringify(session, null, 2));
 		const userId = session.metadata?.userId;
 		const plan = session.metadata?.plan;
 		if (!userId || !plan)

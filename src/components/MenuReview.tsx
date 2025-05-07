@@ -256,12 +256,6 @@ const MenuReview: FC<{
 						: item,
 				),
 			);
-			console.log("[ScanMenuWrapper] reviewMode set to true", {
-				items,
-				dups,
-				news,
-				updates,
-			});
 		}
 		if (items.length) checkDuplicates();
 	}, [items]);

@@ -16,37 +16,45 @@ export default function ProfileNav() {
 		window.location.href = "/";
 	};
 	return (
-		<nav className="w-full bg-white border-b border-gray-200 py-3 px-4 flex items-center justify-between">
-			<div className="flex items-center gap-2">
+		<nav className="w-full bg-white border-b border-gray-200 py-3 px-2 sm:px-4 flex flex-wrap items-center justify-between gap-2 sm:gap-0">
+			<div className="flex items-center gap-2 min-w-0">
 				<Image
 					src="/logo.svg"
 					alt="TasteCheq Logo"
-					width={32}
-					height={32}
+					width={28}
+					height={28}
 					className="rounded"
 				/>
-				<Link href="/" className="text-xl font-bold text-blue-700">
+				<Link
+					href="/"
+					className="hidden sm:inline text-lg sm:text-xl font-bold text-blue-700 truncate"
+				>
 					TasteCheq
 				</Link>
 			</div>
-			<div className="flex gap-4 items-center">
-				<Link href="/" className="hover:underline text-blue-700 font-medium">
+			<div className="flex gap-3 sm:gap-4 items-center flex-wrap min-w-0">
+				<Link
+					href="/"
+					className="hover:underline text-blue-700 font-medium text-sm sm:text-base"
+				>
 					Home
 				</Link>
 				{user && (
 					<Link
 						href="/scan"
-						className="hover:underline text-blue-700 font-medium"
+						className="hover:underline text-blue-700 font-medium text-sm sm:text-base"
 					>
 						Scan
 					</Link>
 				)}
-				<Link
-					href="/profile"
-					className="hover:underline text-blue-700 font-medium"
-				>
-					Profile
-				</Link>
+				{user && (
+					<Link
+						href="/profile"
+						className="hover:underline text-blue-700 font-medium text-sm sm:text-base"
+					>
+						Profile
+					</Link>
+				)}
 				{user && (
 					<Button
 						variant="secondary"

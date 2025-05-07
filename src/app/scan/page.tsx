@@ -1,12 +1,21 @@
 import ProfileNav from "@/app/profile/ProfileNav";
 import ScanFlow from "@/components/ScanFlow";
+import { getUserFromSessionCookie } from "@/lib/auth";
+import { cookies } from "next/headers";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
-export default function ScanPage({
+export default async function ScanPage({
 	searchParams,
 }: {
 	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+	const cookieStore = await cookies();
+	const sessionId = cookieStore.get("session")?.value;
+	const user = await getUserFromSessionCookie(sessionId);
+	if (!user) {
+		redirect("/auth");
+	}
 	return (
 		<div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-white">
 			<ProfileNav />
