@@ -3,6 +3,7 @@ import { getUserFromSessionCookie } from "@/lib/auth";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from "next/headers";
+import { NuqsAdapter } from "nuqs/adapters/next";
 import type React from "react";
 import "./globals.css";
 
@@ -31,11 +32,14 @@ export default async function RootLayout({
 	const user = await getUserFromSessionCookie(sessionId);
 
 	return (
-		<html lang="en">
-			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-			>
-				<UserProvider user={user}>{children}</UserProvider>
+		<html
+			lang="en"
+			className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+		>
+			<body className="font-sans bg-background min-h-screen">
+				<NuqsAdapter>
+					<UserProvider user={user}>{children}</UserProvider>
+				</NuqsAdapter>
 			</body>
 		</html>
 	);

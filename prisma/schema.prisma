@@ -50,6 +50,9 @@ model User {
   ratings          Rating[]     @relation("UserRatings")
   triedItems       TriedItem[]  @relation("UserTriedItems")
   sessions         Session[]
+  geminiUsages     GeminiUsage[]
+  subscription     Subscription?
+  ratingUsages     RatingUsage[]
 }
 
 model Restaurant {
@@ -106,7 +109,7 @@ model Rating {
   userId      String
   menuItem    MenuItem @relation(fields: [menuItemId], references: [id])
   menuItemId  String
-  stars       Int
+  stars       Decimal
   text        String?
   imageUrl    String?
   // Audit fields
@@ -145,4 +148,41 @@ model Session {
   user      User     @relation(fields: [userId], references: [id])
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model GeminiUsage {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  month     String   // e.g. "2024-06"
+  count     Int      @default(0)
+  created   DateTime @default(now())
+  updated   DateTime @updatedAt
+
+  @@unique([userId, month])
+}
+
+model Subscription {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String   @unique
+  type         String   // 'monthly', 'yearly', 'lifetime'
+  stripeId     String?  // Stripe subscription or payment intent ID
+  status       String   // 'active', 'canceled', 'expired', etc.
+  started      DateTime @default(now())
+  expires      DateTime?
+  created      DateTime @default(now())
+  updated      DateTime @updatedAt
+}
+
+model RatingUsage {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  month     String   // e.g. "2024-06"
+  count     Int      @default(0)
+  created   DateTime @default(now())
+  updated   DateTime @updatedAt
+
+  @@unique([userId, month])
 }

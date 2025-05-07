@@ -36,6 +36,15 @@ export interface _PrismaMigrations {
   started_at: Generated<Timestamp>;
 }
 
+export interface GeminiUsage {
+  count: Generated<number>;
+  created: Generated<Timestamp>;
+  id: string;
+  month: string;
+  updated: Timestamp;
+  userId: string;
+}
+
 export interface MenuItem {
   category: string | null;
   created: Generated<Timestamp>;
@@ -68,6 +77,15 @@ export interface Rating {
   userId: string;
 }
 
+export interface RatingUsage {
+  count: Generated<number>;
+  created: Generated<Timestamp>;
+  id: string;
+  month: string;
+  updated: Timestamp;
+  userId: string;
+}
+
 export interface Restaurant {
   address: string;
   created: Generated<Timestamp>;
@@ -87,6 +105,18 @@ export interface Session {
   createdAt: Generated<Timestamp>;
   expiresAt: Timestamp;
   id: string;
+  userId: string;
+}
+
+export interface Subscription {
+  created: Generated<Timestamp>;
+  expires: Timestamp | null;
+  id: string;
+  started: Generated<Timestamp>;
+  status: string;
+  stripeId: string | null;
+  type: string;
+  updated: Timestamp;
   userId: string;
 }
 
@@ -121,10 +151,13 @@ export interface User {
 
 export interface DB {
   _prisma_migrations: _PrismaMigrations;
+  GeminiUsage: GeminiUsage;
   MenuItem: MenuItem;
   Rating: Rating;
+  RatingUsage: RatingUsage;
   Restaurant: Restaurant;
   Session: Session;
+  Subscription: Subscription;
   TriedItem: TriedItem;
   User: User;
 }

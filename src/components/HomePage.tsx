@@ -22,6 +22,8 @@ import { Input } from "@/components/ui/input";
 import { arktypeResolver } from "@hookform/resolvers/arktype";
 import { type } from "arktype";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -38,7 +40,7 @@ const signupSchema = type({
 	confirmPassword: "string>6",
 	name: "string>2",
 	city: "string>2",
-	state: "string>2",
+	state: "string==2",
 });
 
 type SignupFormData = typeof signupSchema.infer;
@@ -65,6 +67,7 @@ const HomePage = () => {
 	const [showSignupPassword, setShowSignupPassword] = useState(false);
 	const [showSignupConfirmPassword, setShowSignupConfirmPassword] =
 		useState(false);
+	const pathname = usePathname();
 
 	const onLoginSubmit = async (data: LoginFormData) => {
 		setLoginLoading(true);
@@ -476,12 +479,26 @@ const HomePage = () => {
 						<a href="/privacy" className="hover:underline">
 							Privacy
 						</a>
+						<a href="/profile" className="hover:underline">
+							Profile
+						</a>
 					</div>
 					<div className="text-xs text-blue-200">
 						&copy; {new Date().getFullYear()} TasteCheq. All rights reserved.
 					</div>
 				</div>
 			</footer>
+
+			{/* Floating Scan Button (FAB) */}
+			{pathname !== "/scan" && (
+				<Link
+					href="/scan"
+					className="fixed bottom-6 right-6 rounded-full shadow-lg bg-blue-700 text-white hover:bg-blue-800 h-16 w-16 flex items-center justify-center z-50 transition-colors"
+					aria-label="Scan a Menu"
+				>
+					<Image src="/scan-icon.svg" alt="Scan" width={36} height={36} />
+				</Link>
+			)}
 		</div>
 	);
 };
