@@ -190,8 +190,8 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 			setError("Please select an image file.");
 			return;
 		}
-		if (file.size > 4.5 * 1024 * 1024) {
-			setError("File is too large. Please select an image under 4.5MB.");
+		if (file.size > 3.3 * 1024 * 1024) {
+			setError("File is too large. Please select an image under 3.3MB.");
 			return;
 		}
 		const reader = new FileReader();
