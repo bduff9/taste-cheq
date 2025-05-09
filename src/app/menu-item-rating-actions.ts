@@ -170,6 +170,9 @@ export async function getMenuItemsWithAggregates(restaurantId: string) {
 		.where("deleted", "is", null)
 		.orderBy("created", "desc")
 		.execute();
+
+	if (items.length === 0) return [];
+
 	// For each item, get average rating and review count
 	const aggregates = await db
 		.selectFrom("Rating")
