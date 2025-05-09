@@ -103,6 +103,53 @@ const getMenuItemKey = (
 		: `${item.name}-${idx}`;
 };
 
+// Utility: Compress and resize image to stay under maxSizeMB
+async function compressImage(
+	file: File,
+	maxSizeMB = 3.3,
+	maxWidth = 1600,
+	maxHeight = 1600,
+	quality = 0.8,
+): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const img = new window.Image();
+		const url = URL.createObjectURL(file);
+		img.onload = () => {
+			let { width, height } = img;
+			if (width > maxWidth || height > maxHeight) {
+				const scale = Math.min(maxWidth / width, maxHeight / height);
+				width = Math.round(width * scale);
+				height = Math.round(height * scale);
+			}
+			const canvas = document.createElement("canvas");
+			canvas.width = width;
+			canvas.height = height;
+			const ctx = canvas.getContext("2d");
+			ctx?.drawImage(img, 0, 0, width, height);
+
+			function tryExport(q: number) {
+				canvas.toBlob(
+					(blob) => {
+						if (!blob) return reject(new Error("Compression failed"));
+						if (blob.size <= maxSizeMB * 1024 * 1024 || q < 0.5) {
+							const reader = new FileReader();
+							reader.onloadend = () => resolve(reader.result as string);
+							reader.readAsDataURL(blob);
+						} else {
+							tryExport(q - 0.1);
+						}
+					},
+					"image/jpeg",
+					q,
+				);
+			}
+			tryExport(quality);
+		};
+		img.onerror = () => reject(new Error("Image load failed"));
+		img.src = url;
+	});
+}
+
 export const ScanMenu: FC<ScanMenuProps> = ({
 	existingMenuItems,
 	onAdd,
@@ -183,25 +230,22 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 		setItemsToUpdate(toUpdate);
 	}, [menuItems, existingMenuItems]);
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 		if (!file.type.startsWith("image/")) {
 			setError("Please select an image file.");
 			return;
 		}
-		if (file.size > 3.3 * 1024 * 1024) {
-			setError("File is too large. Please select an image under 3.3MB.");
-			return;
-		}
-		const reader = new FileReader();
-		reader.onload = (ev) => {
-			setImage(ev.target?.result as string);
+		try {
+			const compressedBase64 = await compressImage(file, 3.3, 1600, 1600, 0.8);
+			setImage(compressedBase64);
 			setError(null);
 			setOcrText(null);
 			setMenuItems([]);
-		};
-		reader.readAsDataURL(file);
+		} catch (err) {
+			setError("Failed to process image. Try a different one.");
+		}
 	};
 
 	const handleUploadClick = () => {
