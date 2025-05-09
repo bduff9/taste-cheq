@@ -2,8 +2,7 @@
 import { login } from "@/app/auth/login-action";
 import { logout } from "@/app/auth/logout-action";
 import { signup } from "@/app/auth/signup-action";
-import ProfileNav from "@/app/profile/ProfileNav";
-import { useUser } from "@/components/UserProvider";
+import ProfileNavClient from "@/app/profile/ProfileNavClient";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -46,8 +45,11 @@ const signupSchema = type({
 
 type SignupFormData = typeof signupSchema.infer;
 
-const HomePage = () => {
-	const { user } = useUser();
+const HomePage = ({
+	user,
+}: {
+	user: { id: string; name: string; email: string; isAdmin?: boolean } | null;
+}) => {
 	const [showAuth, setShowAuth] = useState<"none" | "login" | "signup">("none");
 	const loginForm = useForm<LoginFormData>({
 		resolver: arktypeResolver(loginSchema),
@@ -121,7 +123,7 @@ const HomePage = () => {
 
 	return (
 		<div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-white overflow-x-hidden">
-			<ProfileNav />
+			<ProfileNavClient user={user} />
 
 			{/* Main Hero */}
 			<main className="flex-1 flex flex-col items-center justify-center text-center px-2 sm:px-4">

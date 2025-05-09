@@ -190,6 +190,10 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 			setError("Please select an image file.");
 			return;
 		}
+		if (file.size > 4.5 * 1024 * 1024) {
+			setError("File is too large. Please select an image under 4.5MB.");
+			return;
+		}
 		const reader = new FileReader();
 		reader.onload = (ev) => {
 			setImage(ev.target?.result as string);
@@ -343,7 +347,6 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 				ref={fileInputRef}
 				type="file"
 				accept="image/*"
-				capture="environment"
 				className="hidden"
 				onChange={handleFileChange}
 			/>

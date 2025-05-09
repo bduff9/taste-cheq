@@ -1,71 +1,18 @@
-"use client";
-import { logout } from "@/app/auth/logout-action";
-import { useUser } from "@/components/UserProvider";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
+import { getUserFromSessionCookie } from "@/lib/auth";
+import { cookies } from "next/headers";
+import ProfileNavClient from "./ProfileNavClient";
 
-export default function ProfileNav() {
-	const { user } = useUser();
-	const [logoutLoading, setLogoutLoading] = useState(false);
-	const handleLogout = async () => {
-		setLogoutLoading(true);
-		await logout();
-		setLogoutLoading(false);
-		window.location.href = "/";
-	};
-	return (
-		<nav className="w-full bg-white border-b border-gray-200 py-3 px-2 sm:px-4 flex flex-wrap items-center justify-between gap-2 sm:gap-0">
-			<div className="flex items-center gap-2 min-w-0">
-				<Image
-					src="/logo.svg"
-					alt="TasteCheq Logo"
-					width={28}
-					height={28}
-					className="rounded"
-				/>
-				<Link
-					href="/"
-					className="hidden sm:inline text-lg sm:text-xl font-bold text-blue-700 truncate"
-				>
-					TasteCheq
-				</Link>
-			</div>
-			<div className="flex gap-3 sm:gap-4 items-center flex-wrap min-w-0">
-				<Link
-					href="/"
-					className="hover:underline text-blue-700 font-medium text-sm sm:text-base"
-				>
-					Home
-				</Link>
-				{user && (
-					<Link
-						href="/scan"
-						className="hover:underline text-blue-700 font-medium text-sm sm:text-base"
-					>
-						Scan
-					</Link>
-				)}
-				{user && (
-					<Link
-						href="/profile"
-						className="hover:underline text-blue-700 font-medium text-sm sm:text-base"
-					>
-						Profile
-					</Link>
-				)}
-				{user && (
-					<Button
-						variant="secondary"
-						size="sm"
-						onClick={handleLogout}
-						disabled={logoutLoading}
-					>
-						{logoutLoading ? "Logging out..." : "Logout"}
-					</Button>
-				)}
-			</div>
-		</nav>
-	);
+export default async function ProfileNav() {
+	const cookieStore = await cookies();
+	const sessionId = cookieStore.get("session")?.value;
+	const user = await getUserFromSessionCookie(sessionId);
+	const clientUser = user
+		? {
+				id: user.id,
+				name: user.name,
+				email: user.email,
+				isAdmin: !!user.isAdmin,
+			}
+		: null;
+	return <ProfileNavClient user={clientUser} />;
 }
