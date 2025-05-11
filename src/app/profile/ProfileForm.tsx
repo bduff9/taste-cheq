@@ -135,14 +135,14 @@ export default function ProfileForm() {
 							</FormItem>
 						)}
 					/>
-					<div className="border-t pt-4 mt-4">
+					<div className="border-t pt-4 mt-4 space-y-4">
 						<h3 className="font-medium mb-2">Change Password</h3>
 						<FormField
 							control={form.control}
 							name="currentPassword"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Current Password</FormLabel>
+									<FormLabel className="mb-2">Current Password</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<Input
@@ -172,7 +172,7 @@ export default function ProfileForm() {
 							name="newPassword"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>New Password</FormLabel>
+									<FormLabel className="mb-2">New Password</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<Input
@@ -200,7 +200,7 @@ export default function ProfileForm() {
 							name="confirmPassword"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Confirm New Password</FormLabel>
+									<FormLabel className="mb-2">Confirm New Password</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<Input

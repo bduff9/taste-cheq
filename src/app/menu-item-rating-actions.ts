@@ -1,6 +1,7 @@
 "use server";
 import { getUserFromSessionCookie } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { sql } from "kysely";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { randomUUID } from "node:crypto";
@@ -168,7 +169,7 @@ export async function getMenuItemsWithAggregates(restaurantId: string) {
 		.select(["id", "name", "price", "description"])
 		.where("restaurantId", "=", restaurantId)
 		.where("deleted", "is", null)
-		.orderBy("created", "desc")
+		.orderBy(sql`lower(name)`, "asc")
 		.execute();
 
 	if (items.length === 0) return [];
@@ -257,4 +258,54 @@ export async function getMenuItemWithAggregates(menuItemId: string) {
 		avgStars: aggregate?.avgStars ? Number(aggregate.avgStars) : null,
 		reviewCount: aggregate?.reviewCount ? Number(aggregate.reviewCount) : 0,
 	};
+}
+
+// Fetch the latest 5 positive (4+ stars) reviews with menu item, restaurant, and user info
+export async function getLatestPositiveReviews(limit = 5) {
+	const rows = await db
+		.selectFrom("Rating")
+		.innerJoin("MenuItem", "MenuItem.id", "Rating.menuItemId")
+		.innerJoin("Restaurant", "Restaurant.id", "MenuItem.restaurantId")
+		.innerJoin("User", "User.id", "Rating.userId")
+		.select([
+			"Rating.id as ratingId",
+			"Rating.stars as stars",
+			"Rating.text as text",
+			"Rating.created as created",
+			"MenuItem.id as menuItemId",
+			"MenuItem.name as menuItemName",
+			"MenuItem.price as menuItemPrice",
+			"MenuItem.description as menuItemDescription",
+			"Restaurant.id as restaurantId",
+			"Restaurant.name as restaurantName",
+			"User.id as userId",
+			"User.name as userName",
+			"User.avatarUrl as userAvatarUrl",
+		])
+		.where("Rating.stars", ">=", 4)
+		.where("Rating.deleted", "is", null)
+		.orderBy("Rating.created", "desc")
+		.limit(limit)
+		.execute();
+	return rows.map((row) => ({
+		ratingId: row.ratingId,
+		stars: Number(row.stars),
+		text: row.text ?? undefined,
+		created: row.created,
+		menuItem: {
+			id: row.menuItemId,
+			name: row.menuItemName,
+			price: row.menuItemPrice ? String(row.menuItemPrice) : undefined,
+			description: row.menuItemDescription ?? undefined,
+		},
+		restaurant: {
+			id: row.restaurantId,
+			name: row.restaurantName,
+		},
+		user: {
+			id: row.userId,
+			name: row.userName,
+			avatarUrl: row.userAvatarUrl ?? undefined,
+		},
+	}));
 }

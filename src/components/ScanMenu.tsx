@@ -89,6 +89,8 @@ type ScanMenuProps = {
 		setProgress?: (n: number) => void,
 	) => void;
 	onCancel: () => void;
+	onBack?: () => void;
+	onContinue?: () => void;
 };
 
 // Helper to get a stable key for menu items
@@ -150,10 +152,23 @@ async function compressImage(
 	});
 }
 
+// MenuActions block
+const MenuActions: FC<{
+	handleUploadClick: () => void;
+}> = ({ handleUploadClick }) => (
+	<div className="flex flex-wrap gap-2 mb-4">
+		<Button onClick={handleUploadClick} variant="outline">
+			Take Photo or Upload
+		</Button>
+	</div>
+);
+
 export const ScanMenu: FC<ScanMenuProps> = ({
 	existingMenuItems,
 	onAdd,
 	onCancel,
+	onBack,
+	onContinue,
 }) => {
 	const [image, setImage] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -186,6 +201,10 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 		}[]
 	>([]);
 	const [isUploading, setIsUploading] = useState(false);
+
+	// Add a ref for the review section
+	const reviewRef = useRef<HTMLDivElement>(null);
+	const [highlightReview, setHighlightReview] = useState(false);
 
 	// Fetch usage count and paid status on mount
 	useEffect(() => {
@@ -229,6 +248,16 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 		setUpdateCandidates(updates);
 		setItemsToUpdate(toUpdate);
 	}, [menuItems, existingMenuItems]);
+
+	// After OCR completes and menuItems are set, scroll to review section and highlight
+	useEffect(() => {
+		if (menuItems.length > 0 && reviewRef.current) {
+			reviewRef.current.scrollIntoView({ behavior: "smooth" });
+			setHighlightReview(true);
+			const timeout = setTimeout(() => setHighlightReview(false), 1200);
+			return () => clearTimeout(timeout);
+		}
+	}, [menuItems.length]);
 
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -355,11 +384,14 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 		}
 	};
 
+	const canContinue = menuItems.length > 0;
+
 	return (
 		<div className="max-w-md mx-auto p-4 space-y-4">
 			<h1 className="text-2xl font-bold mb-2">Scan a Menu</h1>
 			<p className="text-muted-foreground mb-4">
-				Upload a photo or take a picture of a menu to digitize it.
+				Upload a photo or take a picture of a menu to digitize it, or manually
+				add items below.
 			</p>
 			{/* OCR Mode Selector */}
 			<div className="flex gap-2 items-center mb-2">
@@ -370,19 +402,22 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 					value={ocrMode}
 					onValueChange={(value) => setOcrMode(value as OcrMode)}
 				>
-					<SelectTrigger className="w-40">
+					<SelectTrigger className="w-40 max-w-full truncate">
 						<SelectValue />
 					</SelectTrigger>
-					<SelectContent>
+					<SelectContent className="max-w-[200px]">
 						<SelectItem value="free">OCR</SelectItem>
 						<SelectItem value="tastecheq">
-							TasteCheq AI{" "}
-							{isPaid ? "(unlimited)" : `(${tastecheqLimit}/mo free)`}
+							<span className="block sm:hidden truncate">AI</span>
+							<span className="hidden sm:inline truncate">
+								TasteCheq AI{" "}
+								{isPaid ? "(unlimited)" : `(${tastecheqLimit}/mo free)`}
+							</span>
 						</SelectItem>
 					</SelectContent>
 				</Select>
 				{ocrMode === "tastecheq" && !isPaid && (
-					<span className="text-xs text-muted-foreground">
+					<span className="text-xs text-muted-foreground truncate max-w-[100px]">
 						{tastecheqLimit - tastecheqUses} TasteCheq uses left this month
 					</span>
 				)}
@@ -391,12 +426,20 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 				ref={fileInputRef}
 				type="file"
 				accept="image/*"
+				capture="environment"
 				className="hidden"
 				onChange={handleFileChange}
 			/>
-			<Button onClick={handleUploadClick} variant="outline">
-				{image ? "Change Image" : "Upload or Take Photo"}
-			</Button>
+			{/* Top actions */}
+			{menuItems.length > 2 ? (
+				<MenuActions handleUploadClick={handleUploadClick} />
+			) : (
+				<div className="flex gap-2 mb-4">
+					<Button onClick={handleUploadClick} variant="outline">
+						{image ? "Change Image" : "Take Photo or Upload"}
+					</Button>
+				</div>
+			)}
 			{error && <p className="text-destructive text-sm">{error}</p>}
 			{image && (
 				<div className="mt-4 space-y-4">
@@ -429,10 +472,18 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 						</div>
 					)}
 					{menuItems.length > 0 && (
-						<div className="mt-4">
-							<h2 className="font-semibold mb-2">
-								Menu Items (Edit as needed)
-							</h2>
+						<div
+							ref={reviewRef}
+							className={
+								highlightReview
+									? "transition-colors duration-500 bg-yellow-100 rounded p-2"
+									: ""
+							}
+						>
+							<div className="mb-2 text-sm text-blue-700 font-medium">
+								Review the scanned menu items below. Edit, split, or merge as
+								needed, then click Continue.
+							</div>
 							<ul className="space-y-2">
 								{menuItems.map((item, idx) => (
 									<li
@@ -515,13 +566,6 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 									</li>
 								))}
 							</ul>
-							<Button
-								className="mt-2 w-full"
-								onClick={handleAddItem}
-								variant="secondary"
-							>
-								Add Menu Item
-							</Button>
 							<div className="flex gap-2 mt-4">
 								<Button
 									onClick={onCancel}
@@ -559,6 +603,9 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 						</div>
 					)}
 				</div>
+			)}
+			{menuItems.length > 2 && (
+				<MenuActions handleUploadClick={handleUploadClick} />
 			)}
 		</div>
 	);

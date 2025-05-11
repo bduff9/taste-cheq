@@ -141,7 +141,6 @@ const MenuReview: FC<{
 		setEditItem({ id: "", name: "", price: "", description: "" });
 		setModalOpen(true);
 	};
-	const canContinue = items.length > 0;
 
 	// Open scan modal
 	const handleUpload = () => {
@@ -260,11 +259,30 @@ const MenuReview: FC<{
 		if (items.length) checkDuplicates();
 	}, [items]);
 
+	// Place ActionButtons and showTopActions here, after all handlers
+	const canContinue = items.length > 0;
+	const ActionButtons = (
+		<div className="flex flex-wrap gap-2 mb-6">
+			<Button onClick={handleUpload}>Upload Menu</Button>
+			<Button variant="secondary" onClick={handleAdd}>
+				Manually Add Item
+			</Button>
+			<Button onClick={onBack} variant="secondary">
+				Back
+			</Button>
+			<Button onClick={onContinue} disabled={!canContinue}>
+				Continue
+			</Button>
+		</div>
+	);
+	const showTopActions = items.length > 2;
+
 	return (
 		<div>
 			<h2 className="text-xl font-bold mb-4">
 				Menu Items for {restaurant.name}
 			</h2>
+			{showTopActions && ActionButtons}
 			{loading && <div className="mb-2 text-blue-600">Loading...</div>}
 			{error && <div className="mb-2 text-red-600">{error}</div>}
 			<div className="space-y-2 mb-4">
@@ -295,20 +313,7 @@ const MenuReview: FC<{
 					</div>
 				))}
 			</div>
-			<div className="flex gap-2 mb-6">
-				<Button onClick={handleUpload}>Upload Menu</Button>
-				<Button variant="secondary" onClick={handleAdd}>
-					Add Item
-				</Button>
-			</div>
-			<div className="flex gap-2">
-				<Button onClick={onBack} variant="secondary">
-					Back
-				</Button>
-				<Button onClick={onContinue} disabled={!canContinue}>
-					Continue
-				</Button>
-			</div>
+			{ActionButtons}
 			{/* Edit/Add Modal */}
 			<Dialog open={modalOpen} onOpenChange={setModalOpen}>
 				<DialogContent>

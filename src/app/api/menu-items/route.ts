@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 		.selectAll()
 		.where("restaurantId", "=", restaurantId)
 		.where("deleted", "is", null)
-		.orderBy("created", "desc")
+		.orderBy(sql`lower(name)`, "asc")
 		.execute();
 	return new Response(JSON.stringify(items), { status: 200 });
 }
