@@ -1,4 +1,5 @@
 "use client";
+import { logout } from "@/app/auth/logout-action";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,8 +16,7 @@ export default function ProfileNavClient({ user }: { user: User | null }) {
 	const [logoutLoading, setLogoutLoading] = useState(false);
 	const handleLogout = async () => {
 		setLogoutLoading(true);
-		// Use fetch to call logout endpoint
-		await fetch("/api/auth/logout", { method: "POST" });
+		await logout();
 		setLogoutLoading(false);
 		window.location.href = "/";
 	};

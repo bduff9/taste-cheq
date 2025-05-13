@@ -74,7 +74,7 @@ export async function PUT(req: NextRequest) {
 	const user = await getUserFromRequest(req);
 	if (!user) return new Response("Unauthorized", { status: 401 });
 	const body = await req.json();
-	const { id, name, price, description } = body;
+	const { id, name, price, description, category, subCategory } = body;
 	if (!id || !name) {
 		return new Response(JSON.stringify({ error: "Missing fields" }), {
 			status: 400,
@@ -86,6 +86,8 @@ export async function PUT(req: NextRequest) {
 			name,
 			price: price ? price : null,
 			description: description || "",
+			category: category ?? "",
+			subCategory: subCategory ?? "",
 			updatedById: user.id,
 			updated: new Date(),
 		})

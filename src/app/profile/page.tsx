@@ -1,5 +1,6 @@
 import UserReviewCard from "@/components/UserReviewCard";
 import { getUserFromSessionCookie } from "@/lib/auth";
+import { formatPrice } from "@/lib/format";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,6 +39,8 @@ export default async function ProfilePage() {
 			text?: string;
 			created: Date;
 			updated?: Date;
+			category?: string;
+			subCategory?: string;
 		}>;
 	};
 	const grouped: Record<string, GroupedRestaurant> = ratings.reduce(
@@ -53,6 +56,8 @@ export default async function ProfilePage() {
 				text: r.rating.text,
 				created: r.rating.created,
 				updated: r.rating.updated,
+				category: r.menuItem.category,
+				subCategory: r.menuItem.subCategory,
 			});
 			return acc;
 		},
@@ -107,12 +112,14 @@ export default async function ProfilePage() {
 												key={item.id}
 												itemName={item.name}
 												stars={item.stars}
-												price={item.price}
+												price={formatPrice(item.price)}
 												description={item.description}
 												review={item.text}
 												date={item.updated || item.created}
 												showEdit={true}
 												editHref={`/scan?restaurantId=${restaurant.id}&step=3`}
+												category={item.category}
+												subCategory={item.subCategory}
 											/>
 										))}
 									</div>

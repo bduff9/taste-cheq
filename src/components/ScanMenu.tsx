@@ -11,6 +11,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CATEGORY_OPTIONS, SUBCATEGORY_OPTIONS } from "@/lib/category-options";
 import type React from "react";
 import { type FC, useEffect, useRef, useState } from "react";
 import Tesseract from "tesseract.js";
@@ -77,6 +78,8 @@ type ScanMenuProps = {
 		name: string;
 		price?: string;
 		description?: string;
+		category?: string;
+		subCategory?: string;
 	}[];
 	onAdd: (
 		itemsToAdd: { name: string; price?: string; description?: string }[],
@@ -180,6 +183,8 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 			name: string;
 			price?: string;
 			description?: string;
+			category?: string;
+			subCategory?: string;
 		}[]
 	>([]);
 	const [ocrMode, setOcrMode] = useState<OcrMode>("free");
@@ -227,14 +232,18 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 		const toUpdate: typeof itemsToUpdate = [];
 		menuItems.forEach((item, idx) => {
 			const match = existingMenuItems.find(
-				(e) => e.name.trim().toLowerCase() === item.name.trim().toLowerCase(),
+				(e) =>
+					e.name.trim().toLowerCase() ===
+					(item.name ?? "").trim().toLowerCase(),
 			);
 			if (match) {
 				dups.push(idx);
 				// If new item has more data (e.g. description), mark as update candidate
 				if (
 					(!match.description && item.description) ||
-					(!match.price && item.price)
+					(!match.price && item.price) ||
+					(!match.category && item.category) ||
+					(!match.subCategory && item.subCategory)
 				) {
 					updates.push(idx);
 					toUpdate.push({ ...item, id: match.id });
@@ -330,11 +339,19 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 	// Manual correction UI handlers
 	const handleEditItem = (
 		idx: number,
-		field: "name" | "price" | "description",
+		field: "name" | "price" | "description" | "category" | "subCategory",
 		value: string,
 	) => {
 		setMenuItems((items) =>
-			items.map((item, i) => (i === idx ? { ...item, [field]: value } : item)),
+			items.map((item, i) =>
+				i === idx
+					? {
+							...item,
+							[field]: value,
+							...(field === "category" ? { subCategory: "" } : {}),
+						}
+					: item,
+			),
 		);
 	};
 	const handleDeleteItem = (idx: number) => {
@@ -491,14 +508,22 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 										className="flex flex-col gap-1 border rounded p-2 bg-background"
 									>
 										<div className="flex gap-2 items-center">
-											<input
-												className="border rounded px-2 py-1 flex-1"
-												value={item.name}
-												onChange={(e) =>
-													handleEditItem(idx, "name", e.target.value)
-												}
-												placeholder="Item name"
-											/>
+											<div className="flex-1">
+												<input
+													className="border rounded px-2 py-1 w-full"
+													value={item.name}
+													onChange={(e) =>
+														handleEditItem(idx, "name", e.target.value)
+													}
+													placeholder="Item name"
+												/>
+												{(item.category || item.subCategory) && (
+													<div className="text-xs text-muted-foreground mt-0.5">
+														{item.category}
+														{item.subCategory ? ` • ${item.subCategory}` : ""}
+													</div>
+												)}
+											</div>
 											<input
 												className="border rounded px-2 py-1 w-20"
 												value={item.price || ""}
@@ -525,6 +550,68 @@ export const ScanMenu: FC<ScanMenuProps> = ({
 											placeholder="Description (optional)"
 											rows={1}
 										/>
+										{/* Category dropdown */}
+										<div className="mt-1">
+											<label
+												htmlFor={`category-select-${idx}`}
+												className="block text-xs font-medium mb-1"
+											>
+												Category
+											</label>
+											<Select
+												value={item.category || ""}
+												onValueChange={(cat: string) =>
+													handleEditItem(idx, "category", cat)
+												}
+											>
+												<SelectTrigger
+													id={`category-select-${idx}`}
+													className="w-full"
+												>
+													<SelectValue placeholder="Select category" />
+												</SelectTrigger>
+												<SelectContent>
+													{CATEGORY_OPTIONS.map((cat: string) => (
+														<SelectItem key={cat} value={cat}>
+															{cat}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+										</div>
+										{/* Sub-category dropdown */}
+										{item.category && SUBCATEGORY_OPTIONS[item.category] && (
+											<div className="mt-1">
+												<label
+													htmlFor={`subcategory-select-${idx}`}
+													className="block text-xs font-medium mb-1"
+												>
+													Sub-Category
+												</label>
+												<Select
+													value={item.subCategory || ""}
+													onValueChange={(sub: string) =>
+														handleEditItem(idx, "subCategory", sub)
+													}
+												>
+													<SelectTrigger
+														id={`subcategory-select-${idx}`}
+														className="w-full"
+													>
+														<SelectValue placeholder="Select sub-category" />
+													</SelectTrigger>
+													<SelectContent>
+														{SUBCATEGORY_OPTIONS[item.category].map(
+															(sub: string) => (
+																<SelectItem key={sub} value={sub}>
+																	{sub}
+																</SelectItem>
+															),
+														)}
+													</SelectContent>
+												</Select>
+											</div>
+										)}
 										<div className="flex gap-2 mt-1">
 											<Button
 												size="sm"

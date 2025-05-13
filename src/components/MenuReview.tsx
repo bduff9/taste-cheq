@@ -8,6 +8,8 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { CATEGORY_OPTIONS, SUBCATEGORY_OPTIONS } from "@/lib/category-options";
+import { formatPrice } from "@/lib/format";
 import { type FC, useEffect, useRef, useState } from "react";
 import { ScanMenu } from "./ScanMenu";
 
@@ -16,6 +18,8 @@ type MenuItem = {
 	name: string;
 	price?: string;
 	description?: string;
+	category: string;
+	subCategory: string;
 };
 
 type Restaurant = {
@@ -138,7 +142,14 @@ const MenuReview: FC<{
 		}
 	};
 	const handleAdd = () => {
-		setEditItem({ id: "", name: "", price: "", description: "" });
+		setEditItem({
+			id: "",
+			name: "",
+			price: "",
+			description: "",
+			category: "",
+			subCategory: "",
+		});
 		setModalOpen(true);
 	};
 
@@ -293,7 +304,15 @@ const MenuReview: FC<{
 					>
 						<div className="flex-1">
 							<div className="font-semibold">{item.name}</div>
-							<div className="text-sm text-gray-500">{item.price}</div>
+							{(item.category || item.subCategory) && (
+								<div className="text-xs text-muted-foreground mt-0.5">
+									{item.category}
+									{item.subCategory ? ` • ${item.subCategory}` : ""}
+								</div>
+							)}
+							<div className="text-sm text-gray-500">
+								{formatPrice(item.price)}
+							</div>
 							<div className="text-xs text-gray-400">{item.description}</div>
 						</div>
 						<Button
@@ -355,6 +374,62 @@ const MenuReview: FC<{
 								)
 							}
 						/>
+						{/* Category dropdown */}
+						<div>
+							<label
+								htmlFor="category-select"
+								className="block text-sm font-medium mb-1"
+							>
+								Category
+							</label>
+							<select
+								id="category-select"
+								className="w-full border rounded px-2 py-1"
+								value={editItem?.category || ""}
+								onChange={(e) => {
+									const cat = e.target.value;
+									setEditItem((i) =>
+										i ? { ...i, category: cat, subCategory: "" } : i,
+									);
+								}}
+								required
+							>
+								<option value="">Select category</option>
+								{CATEGORY_OPTIONS.map((cat) => (
+									<option key={cat} value={cat}>
+										{cat}
+									</option>
+								))}
+							</select>
+						</div>
+						{/* Sub-category dropdown */}
+						{editItem?.category && SUBCATEGORY_OPTIONS[editItem.category] && (
+							<div>
+								<label
+									htmlFor="subcategory-select"
+									className="block text-sm font-medium mb-1"
+								>
+									Sub-Category
+								</label>
+								<select
+									id="subcategory-select"
+									className="w-full border rounded px-2 py-1"
+									value={editItem?.subCategory || ""}
+									onChange={(e) =>
+										setEditItem((i) =>
+											i ? { ...i, subCategory: e.target.value } : i,
+										)
+									}
+								>
+									<option value="">Select sub-category</option>
+									{SUBCATEGORY_OPTIONS[editItem.category].map((sub) => (
+										<option key={sub} value={sub}>
+											{sub}
+										</option>
+									))}
+								</select>
+							</div>
+						)}
 						<div className="flex gap-2 mt-4">
 							<Button
 								type="button"
@@ -419,6 +494,8 @@ const mapDbMenuItemToUi = (item: unknown): MenuItem => {
 		name: i.name,
 		price: i.price ? String(i.price) : "",
 		description: i.description ?? "",
+		category: "",
+		subCategory: "",
 	};
 };
 

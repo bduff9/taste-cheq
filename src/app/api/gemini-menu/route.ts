@@ -1,5 +1,6 @@
 import { isUserPaid } from "@/app/profile/paid-status";
 import { getUserFromSessionCookie } from "@/lib/auth";
+import { CATEGORY_OPTIONS, SUBCATEGORY_OPTIONS } from "@/lib/category-options";
 import { db } from "@/lib/db";
 import type { NextRequest } from "next/server";
 import { randomUUID } from "node:crypto";
@@ -67,8 +68,20 @@ export async function POST(req: NextRequest) {
 	}
 
 	// --- Call Gemini API ---
+	const categoryList = CATEGORY_OPTIONS.join(", ");
+	const subcategoryList = Object.entries(SUBCATEGORY_OPTIONS)
+		.map(([cat, subs]) => `${cat}: [${subs.join(", ")}]`)
+		.join("; ");
+	const prompt = `Extract all menu items from this image. Return a JSON array of objects with name, price if available, description, category, and subCategory fields.
+
+- category is required and must be one of: ${categoryList}.
+- Use the menu context and your best reasoning to assign a subCategory from the allowed options for the selected category. If you cannot confidently assign a subCategory, leave it as an empty string or omit it.
+- Do not use "Other" for subCategory unless it is explicitly listed as an option for the selected category.
+
+Example: [{"name": "Cheeseburger", "price": "$12", "description": "Beef patty, cheese, lettuce, tomato", "category": "Entrée / Main", "subCategory": "Burger"}]
+`;
+
 	const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-	const prompt = `Extract all menu items from this image. Return a JSON array of objects with name, price if available, and description fields. Example: [{"name": "Cheeseburger", "price": "$12", "description": "Beef patty, cheese, lettuce, tomato"}]`;
 
 	const geminiReq = {
 		contents: [
@@ -101,8 +114,13 @@ export async function POST(req: NextRequest) {
 
 	const geminiData = await geminiRes.json();
 	// Try to extract the JSON array from the response
-	let menuItems: Array<{ name: string; price?: string; description?: string }> =
-		[];
+	let menuItems: Array<{
+		name: string;
+		price?: string;
+		description?: string;
+		category?: string;
+		subCategory?: string;
+	}> = [];
 	try {
 		// Gemini returns candidates[0].content.parts[0].text
 		const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -125,6 +143,12 @@ export async function POST(req: NextRequest) {
 			{ status: 500 },
 		);
 	}
+
+	// After parsing menuItems, post-process to convert subCategory 'Other' to ''
+	menuItems = menuItems.map((item) => ({
+		...item,
+		subCategory: item.subCategory === "Other" ? "" : item.subCategory,
+	}));
 
 	return new Response(JSON.stringify(menuItems), {
 		status: 200,

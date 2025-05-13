@@ -1,15 +1,23 @@
 "use client";
+import { useAuthModal } from "@/components/AuthModalContext";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type Review = {
+export type Review = {
 	ratingId: string;
 	stars: number;
 	text?: string;
 	created: string | Date;
-	menuItem: { id: string; name: string; price?: string; description?: string };
+	menuItem: {
+		id: string;
+		name: string;
+		price?: string;
+		description?: string;
+		category: string;
+		subCategory?: string;
+	};
 	restaurant: { id: string; name: string };
 	user: { id: string; name: string; avatarUrl?: string };
 };
@@ -63,6 +71,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews, user }) => {
 	const [index, setIndex] = useState(0);
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);
 	const router = useRouter();
+	const { open: openAuthModal } = useAuthModal();
 
 	// Autoplay logic
 	useEffect(() => {
@@ -90,17 +99,16 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews, user }) => {
 	const handleClick = useCallback(
 		(review: Review) => {
 			if (!user) {
-				// Redirect to sign in, then to menu item page
-				router.push(`/auth?redirect=/menu-item/${review.menuItem.id}`);
+				openAuthModal(`/menu-item/${review.menuItem.id}`);
 			} else {
 				router.push(`/menu-item/${review.menuItem.id}`);
 			}
 		},
-		[user, router],
+		[user, router, openAuthModal],
 	);
 
 	// Keyboard accessibility handler
-	const handleKeyUp = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+	const handleKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (e.key === "Enter" || e.key === " ") {
 			handleClick(reviews[index]);
 		}
@@ -111,6 +119,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews, user }) => {
 
 	return (
 		<div
+			// biome-ignore lint/a11y/useSemanticElements: <explanation>
 			role="button"
 			tabIndex={0}
 			className="relative w-full max-w-xl mx-auto flex flex-col items-center group cursor-pointer focus:outline-none"
@@ -156,6 +165,14 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews, user }) => {
 				<div className="text-sm text-blue-700 font-semibold">
 					{review.menuItem.name}
 				</div>
+				{(review.menuItem.category || review.menuItem.subCategory) && (
+					<div className="text-xs text-muted-foreground mt-0.5">
+						{review.menuItem.category}
+						{review.menuItem.subCategory
+							? ` • ${review.menuItem.subCategory}`
+							: ""}
+					</div>
+				)}
 				{review.menuItem.description && (
 					<div className="text-xs text-gray-500 mb-1">
 						{review.menuItem.description}

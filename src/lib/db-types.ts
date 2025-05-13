@@ -58,6 +58,7 @@ export interface MenuItem {
   name: string;
   price: Numeric | null;
   restaurantId: string;
+  subCategory: string | null;
   updated: Timestamp | null;
   updatedById: string | null;
 }
@@ -70,7 +71,7 @@ export interface Rating {
   id: string;
   imageUrl: string | null;
   menuItemId: string;
-  stars: number;
+  stars: Numeric;
   text: string | null;
   updated: Timestamp | null;
   updatedById: string | null;

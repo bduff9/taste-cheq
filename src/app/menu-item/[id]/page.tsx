@@ -3,6 +3,7 @@ import {
 	getMenuItemWithAggregates,
 } from "@/app/menu-item-rating-actions";
 import { getUserFromSessionCookie } from "@/lib/auth";
+import { formatPrice } from "@/lib/format";
 import { Star } from "lucide-react";
 import { cookies } from "next/headers";
 import type { FC } from "react";
@@ -79,9 +80,15 @@ const MenuItemDetailPage: FC<{ params: Promise<{ id: string }> }> = async ({
 			<MenuItemDetailBackButton />
 			<div className="mb-4">
 				<div className="text-2xl font-bold mb-1">{item.name}</div>
+				{(item.category || item.subCategory) && (
+					<div className="text-xs text-muted-foreground mt-0.5">
+						{item.category}
+						{item.subCategory ? ` • ${item.subCategory}` : ""}
+					</div>
+				)}
 				{item.price && (
 					<div className="text-base text-muted-foreground mb-1">
-						{item.price}
+						{formatPrice(item.price)}
 					</div>
 				)}
 				{item.description && (

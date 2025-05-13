@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { formatPrice } from "@/lib/format";
 import { type } from "arktype";
 import { MessageCircle, Star } from "lucide-react";
 import Link from "next/link";
@@ -18,6 +19,8 @@ type MenuItemRatingCardProps = {
 		name: string;
 		price?: string;
 		description?: string;
+		category?: string;
+		subCategory?: string;
 	};
 	isTried: boolean;
 	rating?: number | string; // 1-5, can be string from DB
@@ -197,9 +200,15 @@ const MenuItemRatingCard: FC<MenuItemRatingCardProps> = ({
 			<div className="flex items-center justify-between gap-2">
 				<div>
 					<div className="font-semibold text-base">{menuItem.name}</div>
+					{(menuItem.category || menuItem.subCategory) && (
+						<div className="text-xs text-muted-foreground mt-0.5">
+							{menuItem.category}
+							{menuItem.subCategory ? ` • ${menuItem.subCategory}` : ""}
+						</div>
+					)}
 					{menuItem.price && (
-						<div className="text-sm text-muted-foreground">
-							{menuItem.price}
+						<div className="text-xs text-gray-500">
+							{formatPrice(menuItem.price)}
 						</div>
 					)}
 					{menuItem.description && (

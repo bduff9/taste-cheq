@@ -84,6 +84,7 @@ model MenuItem {
   name          String
   description   String
   category      String?
+  subCategory   String?
   price         Decimal?
   customFields  Json?
   imageUrl      String?

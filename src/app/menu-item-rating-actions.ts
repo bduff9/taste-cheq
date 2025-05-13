@@ -166,7 +166,7 @@ export async function getMenuItemsWithAggregates(restaurantId: string) {
 	if (!restaurantId) return [];
 	const items = await db
 		.selectFrom("MenuItem")
-		.select(["id", "name", "price", "description"])
+		.select(["id", "name", "price", "description", "category", "subCategory"])
 		.where("restaurantId", "=", restaurantId)
 		.where("deleted", "is", null)
 		.orderBy(sql`lower(name)`, "asc")
@@ -239,7 +239,15 @@ export async function getMenuItemWithAggregates(menuItemId: string) {
 	if (!menuItemId) return null;
 	const item = await db
 		.selectFrom("MenuItem")
-		.select(["id", "name", "price", "description", "restaurantId"])
+		.select([
+			"id",
+			"name",
+			"price",
+			"description",
+			"restaurantId",
+			"category",
+			"subCategory",
+		])
 		.where("id", "=", menuItemId)
 		.where("deleted", "is", null)
 		.executeTakeFirst();
@@ -276,13 +284,15 @@ export async function getLatestPositiveReviews(limit = 5) {
 			"MenuItem.name as menuItemName",
 			"MenuItem.price as menuItemPrice",
 			"MenuItem.description as menuItemDescription",
+			"MenuItem.category as menuItemCategory",
+			"MenuItem.subCategory as menuItemSubCategory",
 			"Restaurant.id as restaurantId",
 			"Restaurant.name as restaurantName",
 			"User.id as userId",
 			"User.name as userName",
 			"User.avatarUrl as userAvatarUrl",
 		])
-		.where("Rating.stars", ">=", 4)
+		.where("Rating.stars", ">=", "4")
 		.where("Rating.deleted", "is", null)
 		.orderBy("Rating.created", "desc")
 		.limit(limit)
@@ -297,6 +307,8 @@ export async function getLatestPositiveReviews(limit = 5) {
 			name: row.menuItemName,
 			price: row.menuItemPrice ? String(row.menuItemPrice) : undefined,
 			description: row.menuItemDescription ?? undefined,
+			category: row.menuItemCategory,
+			subCategory: row.menuItemSubCategory ?? undefined,
 		},
 		restaurant: {
 			id: row.restaurantId,

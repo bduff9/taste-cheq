@@ -9,6 +9,8 @@ type MenuItem = {
 	description?: string;
 	avgStars?: number | null;
 	reviewCount?: number;
+	category: string;
+	subCategory?: string;
 };
 
 type UserTriedItem = {

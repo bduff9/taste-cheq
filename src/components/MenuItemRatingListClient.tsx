@@ -15,6 +15,8 @@ type MenuItem = {
 	name: string;
 	price?: string;
 	description?: string;
+	category: string;
+	subCategory?: string;
 };
 type UserTriedItem = {
 	menuItemId: string;

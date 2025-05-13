@@ -3,24 +3,26 @@ import { db } from "@/lib/db";
 import { cookies } from "next/headers";
 
 export type UserRatingWithRestaurant = {
-	restaurant: {
-		id: string;
-		name: string;
-		address: string;
+		restaurant: {
+			id: string;
+			name: string;
+			address: string;
+		};
+		menuItem: {
+			id: string;
+			name: string;
+			price?: string;
+			description?: string;
+			category?: string;
+			subCategory?: string;
+		};
+		rating: {
+			stars: number;
+			text?: string;
+			created: Date;
+			updated?: Date;
+		};
 	};
-	menuItem: {
-		id: string;
-		name: string;
-		price?: string;
-		description?: string;
-	};
-	rating: {
-		stars: number;
-		text?: string;
-		created: Date;
-		updated?: Date;
-	};
-};
 
 export async function getUserRatingsWithRestaurants(): Promise<
 	UserRatingWithRestaurant[]
@@ -45,6 +47,8 @@ export async function getUserRatingsWithRestaurants(): Promise<
 			"MenuItem.name as menuItemName",
 			"MenuItem.price as menuItemPrice",
 			"MenuItem.description as menuItemDescription",
+			"MenuItem.category as menuItemCategory",
+			"MenuItem.subCategory as menuItemSubCategory",
 			"Restaurant.id as restaurantId",
 			"Restaurant.name as restaurantName",
 			"Restaurant.address as restaurantAddress",
@@ -65,6 +69,8 @@ export async function getUserRatingsWithRestaurants(): Promise<
 			name: row.menuItemName,
 			price: row.menuItemPrice ? String(row.menuItemPrice) : undefined,
 			description: row.menuItemDescription ?? undefined,
+			category: row.menuItemCategory ?? undefined,
+			subCategory: row.menuItemSubCategory ?? undefined,
 		},
 		rating: {
 			stars: Number(row.stars),

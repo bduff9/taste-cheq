@@ -19,6 +19,8 @@ type MenuItem = {
 	name: string;
 	price?: string;
 	description?: string;
+	category: string;
+	subCategory?: string;
 };
 type UserTriedItem = {
 	menuItemId: string;
@@ -32,7 +34,6 @@ type UserRating = {
 type ScanFlowClientProps = {
 	initialStep: number;
 	initialRestaurant: Restaurant | null;
-	initialRestaurantId: string | null;
 	menuItems: MenuItem[];
 	userRatings: UserRating[];
 	userTriedItems: UserTriedItem[];
@@ -42,7 +43,6 @@ type ScanFlowClientProps = {
 const ScanFlowClient: FC<ScanFlowClientProps> = ({
 	initialStep,
 	initialRestaurant,
-	initialRestaurantId,
 	menuItems,
 	userRatings,
 	userTriedItems,

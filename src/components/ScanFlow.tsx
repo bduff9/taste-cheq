@@ -19,6 +19,8 @@ type MenuItem = {
 	name: string;
 	price?: string;
 	description?: string;
+	category: string;
+	subCategory?: string;
 };
 type UserTriedItem = {
 	menuItemId: string;
@@ -66,11 +68,14 @@ export default async function ScanFlow({
 				description: item.description ?? undefined,
 				avgStars: item.avgStars ?? null,
 				reviewCount: item.reviewCount ?? 0,
+				category: item.category ?? "",
+				subCategory: item.subCategory ?? undefined,
 			}),
 		);
 		// Fetch user ratings and tried items
 		userRatings = (await getUserMenuItemRatings(restaurantId)).map((r) => ({
 			...r,
+			stars: Number(r.stars),
 			text: r.text ?? undefined,
 		}));
 		userTriedItems = await getUserTriedItems(restaurantId);
@@ -82,7 +87,6 @@ export default async function ScanFlow({
 		<ScanFlowClient
 			initialStep={step}
 			initialRestaurant={restaurant}
-			initialRestaurantId={restaurantId}
 			menuItems={menuItems}
 			userRatings={userRatings}
 			userTriedItems={userTriedItems}

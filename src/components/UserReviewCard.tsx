@@ -1,3 +1,4 @@
+import { formatPrice } from "@/lib/format";
 import { Pencil, Star } from "lucide-react";
 import Link from "next/link";
 import type { FC } from "react";
@@ -11,6 +12,8 @@ type UserReviewCardProps = {
 	date: Date;
 	showEdit?: boolean;
 	editHref?: string;
+	category?: string;
+	subCategory?: string;
 };
 
 const UserReviewCard: FC<UserReviewCardProps> = ({
@@ -22,6 +25,8 @@ const UserReviewCard: FC<UserReviewCardProps> = ({
 	date,
 	showEdit = false,
 	editHref,
+	category,
+	subCategory,
 }) => {
 	// Render stars with half-star support (one icon per star)
 	const renderStars = () => {
@@ -89,7 +94,15 @@ const UserReviewCard: FC<UserReviewCardProps> = ({
 					</Link>
 				)}
 			</div>
-			{price && <div className="text-xs text-gray-500">{price}</div>}
+			{(category || subCategory) && (
+				<div className="text-xs text-muted-foreground mt-0.5">
+					{category}
+					{subCategory ? ` • ${subCategory}` : ""}
+				</div>
+			)}
+			{price && (
+				<div className="text-xs text-gray-500">{formatPrice(price)}</div>
+			)}
 			{description && (
 				<div className="text-xs text-gray-400">{description}</div>
 			)}
