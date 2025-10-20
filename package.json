@@ -58,7 +58,7 @@
 		"jsdom": "^26.1.0",
 		"knip": "5.55.1",
 		"kysely-codegen": "0.18.3",
-		"playwright": "1.52.0",
+		"playwright": "1.55.1",
 		"prisma": "6.7.0",
 		"storybook": "8.6.12",
 		"tailwindcss": "4.1.5",
